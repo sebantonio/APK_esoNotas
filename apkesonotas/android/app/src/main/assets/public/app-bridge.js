@@ -59,14 +59,8 @@
   }
 
   function _saveToStorage() {
-    if (!_workbook) return;
-    try {
-      const wbout = XLSX.write(_workbook, { bookType: "xlsx", type: "binary" });
-      // "binary" devuelve una cadena binaria directamente — btoa sin loop
-      localStorage.setItem(DATA_KEY, btoa(wbout));
-    } catch(e) {
-      // Ignorar errores de quota u otros — el workbook sigue en memoria
-    }
+    // Deshabilitado: XLSX.write es síncrono y bloquea el hilo principal en Android WebView
+    // El workbook se mantiene en _workbook durante la sesión
   }
 
   // Descarga el xlsx actual al dispositivo
@@ -264,8 +258,7 @@
     },
 
     verifyFileExists: (_filePath) => {
-      // En Android verificamos si está en memoria/storage
-      return Promise.resolve(!!localStorage.getItem(DATA_KEY));
+      return Promise.resolve(!!_workbook || !!localStorage.getItem(DATA_KEY));
     },
 
     getUnidades: () => Promise.resolve(_getUnidades()),
